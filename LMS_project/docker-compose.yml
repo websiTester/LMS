@@ -1,0 +1,11 @@
+services:
+  postgres:
+      image: pgvector/pgvector:pg17
+      container_name: lms_db
+      ports:
+        - "127.0.0.1:5430:5432"
+      environment:
+        POSTGRES_USER: user
+        POSTGRES_PASSWORD: pass
+        POSTGRES_DB: lms_db
+      user: "postgres:postgres"

@@ -1,15 +1,16 @@
 import { MoreHorizontal } from "lucide-react";
-import type { User } from "../../../../shared/types/user";
+import type { User } from "../../../../../shared/types/user";
+import { formatTime } from "@/shared/utils/format-time";
 
+
+import { getRoleStyle, getStatusStyle } from "../../utils/styles";
 
 interface UserTableProps {
   filteredUsers: User[];
-  getRoleStyle: (role: string) => string;
-  getStatusStyle: (status: string) => string;
   setSelectedUser: (user: User) => void;
 }
 
-const UserTable = ({ filteredUsers, getRoleStyle, getStatusStyle, setSelectedUser }: UserTableProps) => {
+const UserTable = ({ filteredUsers, setSelectedUser }: UserTableProps) => {
     return ( 
         <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl p-6 shadow-sm">
           {/* Table Header */}
@@ -53,7 +54,7 @@ const UserTable = ({ filteredUsers, getRoleStyle, getStatusStyle, setSelectedUse
 
                 {/* Joined Date */}
                 <div className="col-span-2 hidden lg:flex items-center text-sm text-slate-600 dark:text-slate-400">
-                  {user.created_at || 'N/A'}
+                  { formatTime(user.created_at) }
                 </div>
 
                 {/* Actions */}

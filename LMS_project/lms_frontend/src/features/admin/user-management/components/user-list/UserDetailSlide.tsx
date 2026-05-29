@@ -1,14 +1,16 @@
 import { Calendar, Mail, Phone, Shield, X } from "lucide-react";
-import type { User } from "../../../../shared/types/user";
+import type { User } from "../../../../../shared/types/user";
+import { NavLink } from "react-router-dom";
+import { formatTime } from "@/shared/utils/format-time";
+
+import { getRoleStyle, getStatusStyle } from "../../utils/styles";
 
 interface UserDetailSlideProps {
   selectedUser: User | null;
   setSelectedUser: (user: UserDetailSlideProps['selectedUser']) => void;
-  getStatusStyle: (status: string) => string;
-  getRoleStyle: (role: string) => string;
 }
 
-const UserDetailSlide = ({ selectedUser, setSelectedUser, getStatusStyle, getRoleStyle }: UserDetailSlideProps) => {
+const UserDetailSlide = ({ selectedUser, setSelectedUser }: UserDetailSlideProps) => {
     return ( 
         <div className="fixed inset-0 z-50 flex justify-end">
           <div className="absolute inset-0 bg-slate-900/30 backdrop-blur-sm" onClick={() => setSelectedUser(null)} />
@@ -63,7 +65,9 @@ const UserDetailSlide = ({ selectedUser, setSelectedUser, getStatusStyle, getRol
                             <div className="flex items-center gap-3 text-slate-600 dark:text-slate-300">
                                 <Calendar className="w-4 h-4 text-slate-400" /> Ngày tham gia
                             </div>
-                            <span className="text-slate-600 dark:text-slate-300">{selectedUser.created_at || 'N/A'}</span>
+                            <span className="text-slate-600 dark:text-slate-300">
+                                {formatTime(selectedUser.created_at)}
+                            </span>
                             </div>
                         </div>
                         </div>
@@ -71,9 +75,9 @@ const UserDetailSlide = ({ selectedUser, setSelectedUser, getStatusStyle, getRol
                     </div>
                     {/* Drawer Footer */}
             <div className="p-6 border-t border-slate-200 dark:border-slate-700 grid grid-cols-2 gap-3">
-              <button className="py-2.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 rounded-lg text-sm font-medium text-slate-700 dark:text-slate-200 transition-colors">
+              <NavLink to={`/admin/users/${selectedUser.id}`} className="flex items-center justify-center py-2.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 rounded-lg text-sm font-medium text-slate-700 dark:text-slate-200 transition-colors">
                 Chỉnh sửa
-              </button>
+              </NavLink>
               {selectedUser.is_active === true ? (
                 <button className="py-2.5 bg-red-50 hover:bg-red-100 dark:bg-red-900/20 dark:hover:bg-red-900/40 border border-red-200 dark:border-red-800/50 text-red-600 dark:text-red-400 rounded-lg text-sm font-medium transition-colors">
                   Khóa tài khoản

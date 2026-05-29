@@ -1,24 +1,24 @@
 
+from datetime import datetime
 from typing import Annotated, Literal, Optional
 
 from pydantic import BaseModel, EmailStr, Field, model_validator
 from pydantic.functional_validators import AfterValidator
 from pydantic_core import PydanticCustomError
+from user.utils import validate_length
 
 
-def validate_length(min_length: int, max_length: int, fieldName: str):
-    def validator(value: str):
-        if len(value) < min_length or len(value) > max_length:
-            raise PydanticCustomError("Too_short", "{fieldName} must be at least {min_length} and at most {max_length} characters long and in correct format", {"fieldName": fieldName, "min_length": min_length, "max_length": max_length})
-        return value
-    return validator
+class UserBase(BaseModel):
+    email: Annotated[EmailStr, AfterValidator(validate_length(10, 100, "Email"))]
 
-class UserCreate(BaseModel):
-    # email: EmailStr = Field(min_length=5, max_length=100)
-    email: Annotated[EmailStr, AfterValidator(validate_length(10, 100, "Email"))]  #Reusable validator
+
+class UserCreate(UserBase):
     password: Annotated[str, AfterValidator(validate_length(6, 100, "Password"))]
     confirm_password: Annotated[str, AfterValidator(validate_length(6, 100, "Confirm Password"))]
+
     role: Literal["student", "teacher", "admin"]
+
+    is_active: Optional[bool] = True
 
     @model_validator(mode="after")
     def passwords_match(self):
@@ -27,17 +27,15 @@ class UserCreate(BaseModel):
         return self
 
 
-class UserLogin(BaseModel):
-    email: Annotated[EmailStr, AfterValidator(validate_length(10, 100, "Email"))]  #Reusable validator
+class UserLogin(UserBase):
     password: Annotated[str, AfterValidator(validate_length(6, 100, "Password"))]
     rememberMe: Optional[bool] = False
 
 
-class UserRead(BaseModel):
+class UserRead(UserBase):
     id: int
-    email: EmailStr = Field(min_length=5, max_length=100)
     full_name: Optional[str] = Field(default="Not provided")
     phone_number: Optional[str] = Field(default="Not provided")
-    created_at: Optional[str] = Field(default="Not provided")
-    role: Literal["student", "teacher", "admin"]
+    created_at: Optional[datetime]
     is_active: bool
+    role: Literal["student", "teacher", "admin"]

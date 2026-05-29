@@ -1,4 +1,6 @@
 
+from datetime import datetime, timezone
+
 from core.security import hash_password, verify_password
 from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -7,7 +9,7 @@ from user.models import User
 from user.schemas import UserCreate
 
 
-async def create_user(db: AsyncSession, createUserRequest: UserCreate) -> User:
+async def register_user_service(db: AsyncSession, createUserRequest: UserCreate) -> User:
 
     # Check if user already exists
     existing_user = await db.execute(select(User).where(User.email == createUserRequest.email))
@@ -19,7 +21,7 @@ async def create_user(db: AsyncSession, createUserRequest: UserCreate) -> User:
         })
     
     # Create new user
-    new_user = User(username=createUserRequest.email, email=createUserRequest.email, hashed_password=hash_password(createUserRequest.password), role=createUserRequest.role)  # You should hash the password in a real application
+    new_user = User(username=createUserRequest.email, email=createUserRequest.email, hashed_password=hash_password(createUserRequest.password), role='student', created_at=datetime.now(timezone.utc) )  # You should hash the password in a real application
     db.add(new_user)
     await db.commit()
     await db.refresh(new_user)
@@ -56,3 +58,30 @@ async def get_all_users_service(db: AsyncSession) -> list[User]:
     result = await db.execute(select(User))
     users = result.scalars().all()
     return list(users)
+
+
+async def upsert_user(db: AsyncSession, user: UserCreate) -> User:
+    existing_user = await db.execute(select(User).where(User.email == user.email))
+    existing_user = existing_user.scalar_one_or_none()
+
+    if existing_user is None:
+        new_user = User(
+            username=user.email, 
+            email=user.email, 
+            hashed_password=hash_password(user.password), 
+            role=user.role, 
+            created_at=datetime.now(timezone.utc),
+            is_active=user.is_active if user.is_active is not None else True)
+              # You should hash the password in a real application
+        db.add(new_user)
+        await db.commit()
+        await db.refresh(new_user)
+        return new_user
+    else:
+        existing_user.hashed_password = hash_password(user.password)
+        existing_user.role = user.role
+        if user.is_active is not None:
+            existing_user.is_active = user.is_active
+        await db.commit()
+        await db.refresh(existing_user)
+        return existing_user

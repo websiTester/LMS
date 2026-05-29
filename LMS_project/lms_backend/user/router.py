@@ -10,7 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from user.models import User
 
 from .schemas import UserCreate, UserLogin, UserRead
-from .services import create_user, get_all_users_service, login_user_service
+from .services import get_all_users_service, login_user_service, register_user_service
 
 router = APIRouter(
     prefix="/users",
@@ -24,7 +24,7 @@ async def register_user(
     db: AsyncSession=Depend(get_db),
     ):
     # This is a placeholder for the actual implementation
-    result = await create_user(db, payload)
+    result = await register_user_service(db, payload)
     return result
 
 

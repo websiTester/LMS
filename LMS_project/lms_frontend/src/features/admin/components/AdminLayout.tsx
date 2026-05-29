@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { AdminSidebar } from './components/Sidebar';
+import { AdminSidebar } from './Sidebar';
 import { Outlet } from 'react-router';
 
 

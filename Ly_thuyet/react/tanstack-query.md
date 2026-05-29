@@ -336,6 +336,46 @@ Component mount → cần hiển thị data từ server → đọc
 
 ---
 
+## Vai trò của queryClient.setQueryData và queryClient.clear
+
+Mặc dù đôi khi việc xóa hai lệnh này không gây ra lỗi ngay lập tức (đặc biệt khi dùng `window.location.href` để hard-reload trang), chúng đóng vai trò cực kỳ quan trọng về **Hiệu năng (Performance)** và **Bảo mật (Security)** trong ứng dụng SPA.
+
+### `queryClient.setQueryData` (Dùng khi Login)
+Khi đăng nhập thành công, server trả về thông tin user. Thay vì để component Dashboard tự gọi API lần nữa qua `useQuery(['currentUser'])`, ta ép dữ liệu vào cache ngay lập tức:
+```typescript
+queryClient.setQueryData(['currentUser'], result)
+```
+- **Tác dụng:** Component sẽ lấy data từ Cache dùng luôn (Zero-loading state) → Trải nghiệm mượt mà, tiết kiệm 1 request thừa lên server.
+
+### `queryClient.clear()` (Dùng khi Logout)
+Khi user bấm đăng xuất, bắt buộc phải xóa sạch Cache:
+```typescript
+queryClient.clear()
+```
+- **Tác dụng:** Tránh rò rỉ dữ liệu (Data Leakage). Nếu không clear, người dùng B đăng nhập vào cùng trình duyệt (mà không hard-reload) có thể nhìn thấy dữ liệu nhạy cảm (khóa học đã mua, thẻ tín dụng...) của người dùng A lưu trong Cache.
+
+---
+
+## Thứ tự viết `queryKey` và `queryFn`
+
+Trong JavaScript, thứ tự các thuộc tính (keys) truyền vào một Object `{}` không hề ảnh hưởng đến logic thực thi. Việc viết `queryKey` trước hay sau `queryFn` đều cho kết quả giống hệt nhau.
+
+```typescript
+// Viết queryKey trước hay sau đều chạy y hệt nhau
+export const useGetCurrentUser = () => {
+    return useQuery({
+        queryKey: ['currentUser'],  // Viết trước
+        queryFn: getCurrentUserRequest, // Viết sau
+    })
+}
+```
+
+**Tại sao convention luôn là viết `queryKey` trước?**
+- Vì lý do **Clean Code & Readability**. 
+- `queryKey` đóng vai trò là "Định danh / Tên gọi" (Cái này là cái gì?), còn `queryFn` là "Hành động" (Làm sao để lấy được nó?). Tư duy đọc code tự nhiên là đọc Tên trước rồi mới xem Cách thức hoạt động sau, giúp code dễ bảo trì hơn.
+
+---
+
 ## 🔗 References
 - [TanStack Query Official Documentation](https://tanstack.com/query/v5)
 - [Practical React Query — TkDodo blog series](https://tkdodo.eu/blog/practical-react-query)

@@ -247,3 +247,6 @@ for u in users:
 - **Object detached vẫn truy cập relationship** → `DetachedInstanceError`.
 - **Define model nhưng quên import** vào nơi tạo bảng → Alembic không thấy → migration thiếu bảng.
 - **Hai session cùng track 1 row** → Identity Map khác nhau, có thể conflict khi commit.
+- **Lỗi `Undefined name 'Date'` (Nhầm cú pháp Javascript):** Rất hay gặp khi cố truyền `create_at=Date.now()` lúc tạo object mới. Trong Python phải dùng `datetime.now(timezone.utc)`. 
+- **Tự truyền thời gian thủ công thay vì để DB tự lo:** Thay vì phải tự truyền thời gian bằng Python mỗi lần tạo object mới, hãy luôn luôn cấu hình `server_default=func.now()` ở trong Model. Lúc này Database sẽ tự lấy ngày giờ lúc insert, code Python cực kỳ nhàn.
+- **Lỗi `Type "tuple[User]" is not assignable to return type "User"` (Dấu phẩy thừa chết người):** Rất hay mắc phải khi khởi tạo Model mà lỡ tay để thừa dấu phẩy (`,`) ở cuối cùng (`new_user = User(...),`). Trong Python, dấu phẩy thừa này sẽ biến biến `new_user` thành một `Tuple` chứa object thay vì chính object đó. Hậu quả là `db.add(new_user)` sẽ sập hệ thống (Crash). Hãy cẩn thận xóa dấu phẩy thừa này!

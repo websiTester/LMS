@@ -6,14 +6,15 @@ import Login from './pages/public/Login';
 import StudentDashBoardPage from './pages/student/DashboardPage';
 import CourseList from './pages/public/CourseListPage';
 import CourseDetailPage from './pages/public/CourseDetailPage';
-import AdminDashboard from './features/admin/AdminDashboard';
+import AdminDashboard from './features/admin/components/AdminDashboard';
 import { ProtectedRoute } from './shared/components/ProtectedRoute';
 import GuestRoute from './shared/components/GuestRoute';
 import InitAuth from './shared/components/InitAuth';
 import Unauthorized from './shared/components/Unauthorized';
-import UserManagement from './features/admin/user-management/components/UserManagement';
-import AdminLayout from './features/admin/AdminLayout';
+import UserManagement from './features/admin/user-management/components/user-list/UserManagement';
+import AdminLayout from './features/admin/components/AdminLayout';
 import LogoutPage from './pages/public/Logout';
+import UserDetail from './features/admin/user-management/components/user-detail/UserDetail';
 function App() {
 
 
@@ -42,6 +43,7 @@ function App() {
                 <Route path="/admin" element={<AdminLayout />}>
                   <Route path="dashboard" element={<AdminDashboard />} />
                   <Route path="users" element={<UserManagement />} />
+                  <Route path="users/:id" element={<UserDetail />} />
                 </Route>
               </Route>
               <Route path="*" element={<Notfound/>} />

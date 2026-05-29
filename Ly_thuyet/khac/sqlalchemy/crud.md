@@ -333,3 +333,62 @@ async def get_or_create_user(db: AsyncSession, email: str, name: str) -> User:
 - **Bulk update qua Core không update Identity Map** → object trong session vẫn giữ giá trị cũ, cần `await db.expire_all()` hoặc query lại.
 - **Quên `commit`** sau khi `add()` / `delete()` → thay đổi không persist.
 - **Commit giữa transaction explicit `async with db.begin()`** → lỗi double-commit. Trong context đó, để `async with` tự commit khi exit.
+
+## Phân biệt style query — 1.x vs 2.x
+
+Trên mạng (StackOverflow, tutorial cũ) sẽ thấy nhiều cú pháp query khác nhau. Thực tế chỉ có **1 style đúng** cho async project.
+
+### Style 1: `db.query()` — SQLAlchemy 1.x (Legacy, KHÔNG DÙNG)
+
+```python
+# ❌ Style cũ — chỉ hoạt động với sync Session
+courses = db.query(Course).filter(Course.is_free == True).all()
+user = db.query(User).filter_by(email="a@b.com").first()
+```
+
+- Gọi trực tiếp `.query()` trên `Session`
+- **AsyncSession KHÔNG có `.query()`** → dùng là lỗi ngay
+- SQLAlchemy 2.0+ đánh dấu **deprecated** → sẽ bị xóa
+- Lý do vẫn thấy nhiều: tutorial trước 2023, StackOverflow cũ
+
+### Style 2: `select()` + `db.execute()` — SQLAlchemy 2.x (DÙNG CÁI NÀY)
+
+```python
+# ✅ Style mới — hoạt động cả sync và async
+from sqlalchemy import select
+
+stmt = select(Course).where(Course.slug == slug)
+result = await db.execute(stmt)
+course = result.scalar_one_or_none()
+```
+
+- Tách 2 bước: **tạo statement** (`select()`) → **chạy** (`execute()`)
+- Hỗ trợ **async** hoàn toàn
+- Style chính thức SQLAlchemy 2.x — **project mình dùng cái này**
+
+### Lỗi hay gặp: trộn 2 style
+
+```python
+# ❌ SAI — execute() nhận statement, không nhận Model trực tiếp
+result = await db.execute(Course).where(Course.slug == slug)
+
+# ✅ ĐÚNG — phải select() trước, rồi mới execute()
+stmt = select(Course).where(Course.slug == slug)
+result = await db.execute(stmt)
+```
+
+### Bảng so sánh
+
+| | 1.x Legacy | **2.x Modern** |
+|---|---|---|
+| Cú pháp | `db.query(Model).filter().all()` | `select(Model).where()` + `db.execute(stmt)` |
+| Async | ❌ Không hỗ trợ | ✅ |
+| Status | Deprecated | **Chuẩn hiện tại** |
+| Khi nào thấy | Tutorial trước 2023 | Docs chính thức |
+
+### Cách filter khi đọc tutorial
+
+- Thấy `db.query(...)` → **tutorial cũ**, bỏ qua hoặc tự convert sang `select()`
+- Thấy `select(...)` + `execute(...)` → **đúng style mới**, tham khảo được
+- Khi search Google thêm keyword `"sqlalchemy 2.0"` hoặc `"select()"` để lọc kết quả mới
+

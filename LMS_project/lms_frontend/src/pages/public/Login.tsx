@@ -1,59 +1,48 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { loginSchema } from '../../features/auth/schemas';
+import type { LoginFormData } from '../../features/auth/schemas';
+import { useLogin } from '../../features/auth/api';
+import { useQueryClient } from '@tanstack/react-query';
+import { getDashboardByRole } from '../../shared/utils/navigation';
+import { useAuthStore } from '../../shared/store/authStore';
 
 export default function Login() {
-  const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-    rememberMe: false,
-  });
 
-  const [isLoading, setIsLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
+  const [apiError, setApiError] = useState<string | null>(null);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value, type, checked } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value,
-    }));
-    // Xóa thông báo lỗi khi người dùng bắt đầu nhập lại
-    if (errorMessage) setErrorMessage('');
-  };
+  const queryClient = useQueryClient();
+  const setAuthUser = useAuthStore((state) => state.login);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+    const {register, handleSubmit, formState: { errors, isSubmitting }} = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: '',
+      password: '',
+      rememberMe: false,
+    },
+  })
 
-    if (!formData.email || !formData.password) {
-      setErrorMessage('Vui lòng nhập đầy đủ email và mật khẩu.');
-      return;
-    }
+  const { mutate: login, isPending} = useLogin();
 
-    setIsLoading(true);
-    setErrorMessage('');
+  const onSubmit = async (data: LoginFormData) => {
+    setApiError(null);
+    login(data, {
+      onSuccess: (result) => {
+        console.log('Login successful:', result);
+        setAuthUser(result);
+        queryClient.setQueryData(['currentUser'], result);
+        console.log(`Navigating to dashboard for role: ${result.role} with URL: ${getDashboardByRole(result.role)}`);
+        //navigate(getDashboardByRole(result.role)); no need as the GuestRoute will handle the redirection based on the user role after login
+      },
 
-    try {
-      // MÔ PHỎNG GỌI API: POST /auth/login
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      onError: (error: any)=>{
+        setApiError(error.message || 'Đã có lỗi xảy ra. Vui lòng thử lại.');
+      }
+    })
+  }
 
-      const mockResponse = {
-        token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.login_mock_token'
-      };
-
-      // Set JWT Cookie
-      // Nếu có "Ghi nhớ tôi", set thời gian sống lâu hơn (VD: 30 ngày), ngược lại là session hoặc 1 ngày
-      const maxAge = formData.rememberMe ? 30 * 24 * 60 * 60 : 86400;
-      document.cookie = `jwt_token=${mockResponse.token}; path=/; max-age=${maxAge}; secure; samesite=strict`;
-
-      // Chuyển hướng về trang Dashboard
-      window.location.href = '/dashboard';
-
-    } catch (error) {
-      console.error('Lỗi đăng nhập:', error);
-      setErrorMessage('Email hoặc mật khẩu không chính xác.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   const handleGoogleLogin = () => {
     // Chuyển hướng đến endpoint OAuth của backend (VD: /auth/google)
@@ -107,12 +96,8 @@ export default function Login() {
         </div>
 
         {/* Form Đăng nhập bằng Email/Password */}
-        <form className="mt-6 space-y-6" onSubmit={handleSubmit}>
-          {errorMessage && (
-            <div className="p-3 bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 text-sm rounded-lg border border-red-200 dark:border-red-800">
-              {errorMessage}
-            </div>
-          )}
+        <form className="mt-6 space-y-6" onSubmit={handleSubmit(onSubmit)}>
+
 
           <div className="space-y-4">
             {/* Email Field */}
@@ -122,12 +107,10 @@ export default function Login() {
               </label>
               <input
                 id="email"
-                name="email"
                 type="email"
                 autoComplete="email"
                 required
-                value={formData.email}
-                onChange={handleChange}
+                {...register('email')}
                 className="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:focus:border-blue-400 focus:outline-none transition-colors dark:bg-slate-700 dark:text-white"
                 placeholder="you@example.com"
               />
@@ -140,12 +123,10 @@ export default function Login() {
               </label>
               <input
                 id="password"
-                name="password"
                 type="password"
                 autoComplete="current-password"
                 required
-                value={formData.password}
-                onChange={handleChange}
+                {...register('password')}
                 className="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:focus:border-blue-400 focus:outline-none transition-colors dark:bg-slate-700 dark:text-white"
                 placeholder="••••••••"
               />
@@ -157,10 +138,8 @@ export default function Login() {
             <div className="flex items-center">
               <input
                 id="rememberMe"
-                name="rememberMe"
                 type="checkbox"
-                checked={formData.rememberMe}
-                onChange={handleChange}
+                {...register('rememberMe')}
                 className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700"
               />
               <label htmlFor="rememberMe" className="ml-2 block text-sm text-slate-600 dark:text-slate-400">
@@ -179,10 +158,10 @@ export default function Login() {
           <div>
             <button
               type="submit"
-              disabled={isLoading}
+              disabled={isSubmitting}
               className="group relative w-full flex justify-center py-2.5 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-70 disabled:cursor-not-allowed transition-colors shadow-sm"
             >
-              {isLoading ? (
+              {isPending ? (
                 <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
@@ -191,6 +170,14 @@ export default function Login() {
                 'Đăng nhập'
               )}
             </button>
+            
+            {
+              errors.email || errors.password ? (<p  className="text-red-500 text-sm mt-2">
+              Vui lòng kiểm tra lại thông tin đăng nhập của bạn
+            </p>) : apiError ? (<p className="text-red-500 text-sm mt-2">
+              {apiError}
+            </p>) : ""
+            }
           </div>
         </form>
 

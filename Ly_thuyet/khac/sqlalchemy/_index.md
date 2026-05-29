@@ -18,6 +18,7 @@ module_refs: [M1, M2]
 | [[orm]] — `orm.md` | Declarative Model, `Mapped` vs `mapped_column`, Identity Map + Unit of Work, Lifecycle object, Relationship, N+1 problem |
 | [[code-first]] — `code-first.md` | `Base.metadata.create_all` (dev), Alembic (production), config `env.py`, lỗi `script_location` |
 | [[crud]] — `crud.md` | INSERT/SELECT/UPDATE/DELETE async, transaction, eager loading, CRUD pattern trong FastAPI |
+| [[relationship]] — `relationship.md` | Quan hệ 1-1, 1-N, N-N, association table vs association object, cascade, ví dụ thực tế từ project |
 
 ---
 
@@ -26,7 +27,8 @@ module_refs: [M1, M2]
 1. **`ket-noi-db.md`** — setup connection trước, bắt buộc trước mọi thứ.
 2. **`orm.md`** — hiểu Model + Session cốt lõi trước khi query.
 3. **`crud.md`** — pattern CRUD thực tế (sẽ dùng hàng ngày).
-4. **`code-first.md`** — tạo bảng từ model (khi chuẩn bị migrate schema).
+4. **`relationship.md`** — hiểu cách biểu diễn quan hệ giữa các bảng (cần hiểu ORM trước).
+5. **`code-first.md`** — tạo bảng từ model (khi chuẩn bị migrate schema).
 
 ---
 

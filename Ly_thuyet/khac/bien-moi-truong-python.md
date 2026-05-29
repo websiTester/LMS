@@ -1,6 +1,6 @@
 ---
 tags: [python, env, config, dotenv, pydantic-settings]
-related: [fastapi-config]
+related: [fastapi-config, bien-moi-truong-vite]
 module_refs: [M1, M2]
 ---
 
@@ -365,4 +365,4 @@ class Settings(BaseSettings):
 - [pydantic-settings docs](https://docs.pydantic.dev/latest/concepts/pydantic_settings/)
 - [12-Factor App: Config](https://12factor.net/config) — best practice quản lý config
 - Module liên quan: M1 (project setup), M2 (auth — JWT secret), M16 (payment — VNPay/MoMo API key)
-- Related notes: `[[fastapi-config]]` (chưa tạo — khi học FastAPI config sâu hơn)
+- Related notes: [[fastapi-config]] (chưa tạo — khi học FastAPI config sâu hơn), [[bien-moi-truong-vite]]

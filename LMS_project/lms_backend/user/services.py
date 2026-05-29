@@ -1,4 +1,5 @@
 
+from core.security import hash_password, verify_password
 from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
@@ -18,7 +19,7 @@ async def create_user(db: AsyncSession, createUserRequest: UserCreate) -> User:
         })
     
     # Create new user
-    new_user = User(username=createUserRequest.email, email=createUserRequest.email, hashed_password=createUserRequest.password, role=createUserRequest.role)  # You should hash the password in a real application
+    new_user = User(username=createUserRequest.email, email=createUserRequest.email, hashed_password=hash_password(createUserRequest.password), role=createUserRequest.role)  # You should hash the password in a real application
     db.add(new_user)
     await db.commit()
     await db.refresh(new_user)
@@ -28,6 +29,7 @@ async def create_user(db: AsyncSession, createUserRequest: UserCreate) -> User:
 
 
 async def get_user_by_email_service(db: AsyncSession, email: str) -> User:
+    
     result = await db.execute(select(User).where(User.email == email))
     user = result.scalar_one_or_none()
     if user is None:
@@ -37,3 +39,20 @@ async def get_user_by_email_service(db: AsyncSession, email: str) -> User:
             "field": "email"
         })
     return user
+
+
+async def login_user_service(db: AsyncSession, email: str, password: str) -> User:
+    user = await get_user_by_email_service(db, email)
+    if user is None or not verify_password(password, user.hashed_password):
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail={
+            "code": "INVALID_CREDENTIALS",
+            "message": "Invalid email or password",
+            "field": "email"
+        })
+    return user
+
+
+async def get_all_users_service(db: AsyncSession) -> list[User]:
+    result = await db.execute(select(User))
+    users = result.scalars().all()
+    return list(users)

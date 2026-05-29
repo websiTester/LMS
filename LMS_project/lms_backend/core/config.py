@@ -12,5 +12,11 @@ class Settings(BaseSettings):
         extra="ignore"
         )
     database_url: str = "MISSING_DATABASE_URL"
+    jwt_secret: str = "MISSING_JWT_SECRET"                          # Bắt buộc, app crash nếu thiếu
+    jwt_algorithm: str = "HS256"
+    access_token_expire_minutes: int = 30    # Access token sống 30 phút
+    refresh_token_expire_days: int = 7       # Refresh token sống 7 ngày
+
+    is_production: bool = False  # Mặc định là False, có thể override bằng .env
     
 settings = Settings() 

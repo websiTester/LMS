@@ -1,6 +1,6 @@
 ---
 tags: [fastapi, dependency-injection, depends, endpoint, routing]
-related: [pydantic-schemas, ket-noi-db, async-with-va-yield]
+related: [pydantic-schemas, ket-noi-db, async-with-va-yield, bao-mat-jwt]
 module_refs: [M1, M2, M3]
 ---
 

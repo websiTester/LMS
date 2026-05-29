@@ -2,9 +2,12 @@ import { createRoot } from 'react-dom/client'
 import App from './App.tsx'
 import { StrictMode } from 'react'
 import './index.css'
+import { Providers } from './providers.tsx'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <App />
+    <Providers>
+      <App />
+    </Providers>
   </StrictMode>
 )

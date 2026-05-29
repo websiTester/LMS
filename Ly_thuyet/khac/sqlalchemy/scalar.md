@@ -185,6 +185,11 @@ Cái giá: bạn phải gõ `.scalars().all()` thay vì chỉ `await db.execute(
 
 - **Gọi `.scalars()` 2 lần trên cùng `result`** → lần 2 iter rỗng. `Result` là iterator, đọc 1 lần. Cần dùng lại → `.scalars().all()` thành list rồi xử lý.
 
+- **Lỗi Type Checker (Mypy/Pylance): `Type "Sequence[T]" is not assignable to return type "list[T]"`**:
+  - Khi dùng `result.scalars().all()`, kiểu trả về của SQLAlchemy 2.0 là `Sequence[T]` (một tập hợp chỉ-được-đọc). Nếu hàm của bạn khai báo trả về `list[T]` (tập hợp có thể thay đổi), Type Checker sẽ báo lỗi không tương thích.
+  - **Cách fix 1**: Ép kiểu kết quả sang list thực sự: `return list(result.scalars().all())`
+  - **Cách fix 2**: Đổi type hint của hàm thành `Sequence[T]` (Khuyên dùng: `from typing import Sequence`).
+
 ---
 
 ## Khi nào dùng cái nào — quick decision tree

@@ -27,10 +27,22 @@ def register_error_handlers(app: FastAPI):
     # HTTPException → format chuẩn
     @app.exception_handler(HTTPException)
     async def http_exception_handler(request: Request, exc: HTTPException):
+        
+        code = exc.detail.get("code") if isinstance(exc.detail, dict) else "HTTP_ERROR"
+        message = exc.detail.get("message") if isinstance(exc.detail, dict) else None
+        field = exc.detail.get("field") if isinstance(exc.detail, dict) else None
+
         return JSONResponse(
             status_code=exc.status_code,
             content={
-                "code": "HTTP_ERROR",
-                "message": exc.detail
+                "code": code,
+                "message": "Server validation error",
+                "errors": [
+                    {
+                        "field": field,
+                        "message": message,
+                        "type": code
+                    }
+                ]
             }
         )

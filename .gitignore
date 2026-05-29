@@ -14,6 +14,7 @@ dist-ssr
 .env
 .venv
 .claude
+GEMINI.md
 __pycache__/
 
 # Editor directories and files

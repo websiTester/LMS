@@ -1,7 +1,11 @@
 
 from core.db import get_db
 from course.schemas import CourseRead
-from course.services import get_all_courses_service, get_course_by_slug_service
+from course.services import (
+    get_all_courses_service,
+    get_course_by_id_service,
+    get_course_by_slug_service,
+)
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -34,3 +38,11 @@ async def get_course_by_slug(
     course = await get_course_by_slug_service(db, slug)
     return course
 
+
+@router.get("/{course_id}", response_model=CourseRead)
+async def get_course_by_id(
+    course_id: int,
+    db: AsyncSession = Depends(get_db)
+):
+    course = await get_course_by_id_service(db, course_id)
+    return course

@@ -21,3 +21,11 @@ class CourseRead(BaseModel):
     updated_at: Optional[str]
 
     
+class CourseCreate(BaseModel):
+    title: str
+    description: Optional[str]
+    thumbnail: Optional[str]
+    target_language: str
+    level: str
+    price: float
+    is_free: bool

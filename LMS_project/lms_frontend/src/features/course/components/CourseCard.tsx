@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom"
-import type { CourseRead } from "../type"
 import { LazyImage } from "../../../shared/components/LazyImage"
 import { formatPrice, getLevelColor } from "../utils"
+import type { CourseRead } from "@/shared/types/course"
 
 
 

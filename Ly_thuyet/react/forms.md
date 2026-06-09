@@ -252,6 +252,75 @@ Dùng cho mọi form từ trung bình đến phức tạp, các form cần kiể
 ---
 
 
+## Zod: Xử lý Optional, Nullable và Chuỗi rỗng
+
+### Khái niệm
+Khi khai báo schema với Zod, đôi khi bạn cần một trường không bắt buộc (optional) nhưng lại cho phép giá trị `null` (thường gặp khi form submit hoặc API trả về). Zod cung cấp 3 phương thức để xử lý:
+- `.optional()`: Chỉ cho phép `undefined`.
+- `.nullable()`: Chỉ cho phép `null`.
+- `.nullish()`: Cho phép CẢ `null` và `undefined`. Đây là cách an toàn và gọn nhất khi làm việc với các trường không bắt buộc trong Form.
+
+### Ví dụ code
+```typescript
+import * as z from 'zod';
+
+const schema = z.object({
+  // 1. Chỉ chấp nhận string hoặc undefined
+  description: z.string().optional(),
+  
+  // 2. Chỉ chấp nhận string hoặc null
+  level: z.string().nullable(),
+  
+  // 3. Chấp nhận string, null, hoặc undefined (Khuyên dùng)
+  thumbnail: z.string().url('URL không hợp lệ').nullish(),
+});
+```
+
+### Common pitfall
+- **Vấn đề chuỗi rỗng (Empty string) trong Form:** Khi người dùng để trống thẻ `<input />`, giá trị mặc định form thu được thường là chuỗi rỗng `""`. Các quy tắc kiểm tra định dạng (như `.url()` hay `.email()`) sẽ báo lỗi với chuỗi rỗng này ngay cả khi bạn có đặt `.nullish()`.
+- **Cách khắc phục:** Kết hợp với `.or(z.literal(''))` để cho phép chuỗi rỗng lọt qua vòng kiểm tra định dạng.
+  ```typescript
+  // Cho phép URL hợp lệ, HOẶC chuỗi rỗng, HOẶC null/undefined
+  avatarUrl: z.string().url().or(z.literal('')).nullish(),
+  ```
+
+---
+
+## Hành vi của Checkbox trong React (`e.target.checked`)
+
+### Bản chất của sự kiện `onChange` ở Checkbox
+Nguyên lý hoạt động cơ bản: **Chỉ SAU KHI trình duyệt tự động lật ngược trạng thái (toggle) của checkbox trên DOM, sự kiện `onChange` mới được phát ra.**
+
+Quy trình diễn ra khi user click vào `<input type="checkbox" />`:
+1. Trình duyệt bắt được cú click chuột.
+2. Trình duyệt **tự động** thay đổi trạng thái gốc của thẻ input (đánh dấu hoặc bỏ đánh dấu).
+3. Trình duyệt gọi hàm `onChange`.
+4. Bên trong hàm `onChange`, biến `e.target.checked` sẽ mang **trạng thái mới nhất** (sau khi đã tự động thay đổi) chứ không phải là một giá trị cố định.
+
+### Ví dụ code (Mô hình Controlled Component)
+```tsx
+import { useState } from 'react';
+
+function CheckboxExample() {
+  const [isFree, setIsFree] = useState(false);
+
+  return (
+    // LUÔN LUÔN phải truyền state ngược lại vào thuộc tính `checked`
+    <input 
+      type="checkbox" 
+      checked={isFree} 
+      onChange={(e) => setIsFree(e.target.checked)} 
+    />
+  );
+}
+```
+
+### Common pitfall
+- **Nhầm lẫn `value` và `checked`:** Đối với thẻ `<input type="text">`, chúng ta dùng `e.target.value` để lấy chữ user gõ vào. Nhưng với Checkbox (hoặc Radio), **BẮT BUỘC phải dùng `e.target.checked`** (trả về kiểu Boolean) để biết nó đang bật hay tắt.
+- **Quên truyền `checked={state}`:** Nếu bạn dùng `onChange` để cập nhật biến state nhưng lại không truyền biến state đó vào thuộc tính `checked`, React sẽ mất quyền kiểm soát hiển thị của ô checkbox đó. Hậu quả là nếu bạn thay đổi state ở một nơi khác (VD: Bấm nút "Clear Form"), giao diện ô checkbox sẽ không cập nhật theo.
+
+---
+
 ## 🔗 References
 - [React Hook Form Documentation](https://react-hook-form.com/)
 - [Zod GitHub Repository](https://github.com/colinhacks/zod)

@@ -1,5 +1,6 @@
 from core.error_handlers import register_error_handlers
 from course.router import router as course_router
+from course.teacher_router import router as teacher_course_router
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from user.admin_router import router as admin_user_router
@@ -24,3 +25,4 @@ def read_root():
 app.include_router(user_router)
 app.include_router(course_router)
 app.include_router(admin_user_router)
+app.include_router(teacher_course_router)

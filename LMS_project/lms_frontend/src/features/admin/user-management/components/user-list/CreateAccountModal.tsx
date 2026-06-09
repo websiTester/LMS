@@ -20,7 +20,7 @@ const CreateAccountModal = ({ setIsCreateAccountModalOpen }: CreateAccountModalP
         }
     });
 
-    const {mutate: createAccount, isPending, isError, isSuccess} = useCreateAccount();
+    const {mutate: createAccount, isPending} = useCreateAccount();
 
     const onSubmit = (data: CreateAccountFormData) => {
         createAccount(data, {

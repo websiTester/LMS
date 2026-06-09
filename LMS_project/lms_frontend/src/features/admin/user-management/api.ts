@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { apiClient } from "../../../shared/lib/api-client"
 import type { User } from "../../../shared/types/user"
 import type { CreateAccountFormData } from "./schemas"
+import { userKeys } from "@/shared/types/queryKey"
 
 export const getAllUsersRequest = async (): Promise<User[]> => {
     return apiClient('users/all', {
@@ -11,7 +12,7 @@ export const getAllUsersRequest = async (): Promise<User[]> => {
 
 export const useGetAllUsers = () => {
     return useQuery({
-        queryKey: ['all-users'],
+        queryKey: userKeys.all,
         queryFn: getAllUsersRequest,
     })
 }
@@ -29,7 +30,7 @@ export const useCreateAccount = () => {
     return useMutation({
         mutationFn: createAccountRequest,
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['all-users'] });  //query key phải trùng với query key trong useGetAllUsers để tự động refetch sau khi tạo account mới
+            queryClient.invalidateQueries({ queryKey: userKeys.all });  //query key phải trùng với query key trong useGetAllUsers để tự động refetch sau khi tạo account mới
         }
     })
 }

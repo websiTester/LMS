@@ -15,6 +15,10 @@ import UserManagement from './features/admin/user-management/components/user-lis
 import AdminLayout from './features/admin/components/AdminLayout';
 import LogoutPage from './pages/public/Logout';
 import UserDetail from './features/admin/user-management/components/user-detail/UserDetail';
+import TeacherDashboard from './features/teacher/components/TeacherDashboard';
+import TeacherCoursesList from './features/teacher/course-management/MyCourseClass';
+import TeacherLayout from './features/teacher/components/TeacherLayout';
+import FormCourseWizard from './features/teacher/course-management/FormCourseWizard';
 function App() {
 
 
@@ -46,6 +50,17 @@ function App() {
                   <Route path="users/:id" element={<UserDetail />} />
                 </Route>
               </Route>
+
+
+              <Route element={<ProtectedRoute allowedRoles={['teacher']} />}>
+                <Route path="/teacher" element={<TeacherLayout/>}>
+                <Route path="dashboard" element={<TeacherDashboard />} />
+                <Route path="courses" element={<TeacherCoursesList />} />
+                <Route path="courses/create" element={<FormCourseWizard />} />
+                <Route path="courses/:course_id/edit" element={<FormCourseWizard />} />
+                </Route>
+              </Route>
+
               <Route path="*" element={<Notfound/>} />
            
             </Route>

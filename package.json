@@ -1,0 +1,26 @@
+{
+  "name": "react_roadmap",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev:frontend": "cd LMS_project/lms_frontend && npm run dev",
+    "dev:backend": "cd LMS_project/lms_backend && uvicorn main:app --reload",
+    "dev": "concurrently -c \"cyan,magenta\" -n \"FRONTEND,BACKEND\" \"npm run dev:frontend\" \"npm run dev:backend\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/websiTester/LMS.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/websiTester/LMS/issues"
+  },
+  "homepage": "https://github.com/websiTester/LMS#readme",
+  "devDependencies": {
+    "concurrently": "^10.0.3"
+  }
+}

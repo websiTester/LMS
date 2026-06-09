@@ -1,3 +1,4 @@
+import { userKeys } from "@/shared/types/queryKey";
 import { apiClient } from "../../shared/lib/api-client";
 import { useAuthStore } from "../../shared/store/authStore";
 import type { LoginFormData, RegisterFormData } from "./schemas";
@@ -63,7 +64,7 @@ export const getCurrentUserRequest = async () => {
 
 export const useGetCurrentUser = () => {
     return useQuery({
-        queryKey: ['currentUser'],
+        queryKey: userKeys.current(),
         queryFn: getCurrentUserRequest,
         retry: 0,
     })

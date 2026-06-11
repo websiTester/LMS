@@ -1,0 +1,20 @@
+{
+  "name": "fis-ai-kit-marketplace",
+  "description": "FIS AI Kit marketplace — SDLC toolkit for BA/SA/DEV/Tester roles",
+  "owner": {
+    "name": "FIS AI Team",
+    "email": "ai-kit@fpt.com"
+  },
+  "plugins": [
+    {
+      "name": "fis-ai-kit",
+      "description": "Hybrid SDLC AI Kit for BA/SA/DEV/Tester — artifact-as-contract workflow with Three Amigos gates, supporting greenfield + brownfield modes.",
+      "version": "0.3.0",
+      "source": "./",
+      "author": {
+        "name": "FIS AI Team",
+        "email": "ai-kit@fpt.com"
+      }
+    }
+  ]
+}

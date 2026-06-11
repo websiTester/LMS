@@ -10,7 +10,6 @@ import {
   List,
   Link as LinkIcon
 } from 'lucide-react';
-import { useState } from 'react';
 import { createCourseSchema, type CreateCourseFormData } from '../schemas';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
@@ -26,10 +25,9 @@ export default function FormCourseWizard() {
   const {data: courseData, isLoading} = useGetCourseById(Number(course_id), isEditMode);
   console.log('Course data for editing:', courseData);
   
-  const [isFree, setIsFree] = useState(false);
   const navigate = useNavigate();
 
-  const {register, handleSubmit, formState:{
+  const {register, handleSubmit, watch, formState:{
     errors, isSubmitting
   }} = useForm<CreateCourseFormData>({
     resolver: zodResolver(createCourseSchema),
@@ -54,7 +52,7 @@ export default function FormCourseWizard() {
 
   const {mutate: createCourse } = useCreateCourse();
   const {mutate: updateCourse } = useUpdateCourse();
-
+  const isFree = watch('is_free'); //theo dõi giá trị của trường is_free để hiển thị/ẩn trường price tương ứng
 
   const onSubmit = async (data: CreateCourseFormData) => {
     console.log('Form data:', data);
@@ -81,6 +79,14 @@ export default function FormCourseWizard() {
     }
     
   
+  }
+
+  if(isEditMode && isLoading){
+    return (
+      <div className="h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500"></div>
+      </div>
+    )
   }
 
   return (
@@ -188,7 +194,7 @@ export default function FormCourseWizard() {
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
                   <input {...register('is_free')} type="checkbox" className="sr-only peer" 
-                  onChange={(e) => setIsFree(e.target.checked)}/>
+                  />
                   <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-slate-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-slate-500 peer-checked:bg-blue-600"></div>
                 </label>
               </div>

@@ -1,0 +1,23 @@
+{
+  "name": "fis-ai-kit",
+  "description": "Hybrid SDLC AI Kit for BA/SA/DEV/Tester — artifact-as-contract workflow with Three Amigos gates, supporting greenfield + brownfield modes.",
+  "version": "0.3.0",
+  "author": {
+    "name": "FIS AI Team",
+    "email": "ai-kit@fpt.com"
+  },
+  "homepage": "https://github.com/fis/ai-kit",
+  "license": "Proprietary",
+  "keywords": [
+    "sdlc",
+    "ba",
+    "sa",
+    "dev",
+    "tester",
+    "three-amigos",
+    "artifact-contract",
+    "handoff-protocol",
+    "brownfield",
+    "fis"
+  ]
+}

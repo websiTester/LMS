@@ -16,7 +16,11 @@ dist-ssr
 .claude
 GEMINI.md
 __pycache__/
-
+.gemini
+.claude-lugin
+templates
+CLAUDE.md
+AGENTS.md
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

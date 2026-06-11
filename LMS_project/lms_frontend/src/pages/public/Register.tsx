@@ -23,6 +23,7 @@ export default function Register() {
 
   const {mutate: register_account} = useRegister();
   const onSubmit = async (data: RegisterFormData) => {
+    console.log('Form data:', data);
     setApiError('');
     setIsSucess(false)
     register_account(data, {
@@ -38,6 +39,10 @@ export default function Register() {
     })
 
   };
+
+  const errorMessage = (message: string) => {
+    return <p className="mt-1 text-sm text-red-500  whitespace-pre-line">{message}</p>
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-900 py-12 px-4 sm:px-6 lg:px-8 transition-colors duration-300">
@@ -74,6 +79,7 @@ export default function Register() {
                 className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:outline-none transition-colors dark:bg-slate-700 dark:text-white`}
                 placeholder="you@example.com"
               />
+              {errors.email && errorMessage(errors.email.message!)}
             </div>
 
             {/* Password Field */}
@@ -89,6 +95,7 @@ export default function Register() {
                 className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:outline-none transition-colors dark:bg-slate-700 dark:text-white`}
                 placeholder="Ít nhất 8 ký tự"
               />
+              {errors.password && errorMessage(errors.password.message!)}
             </div>
 
             {/* Confirm Password Field */}
@@ -104,6 +111,7 @@ export default function Register() {
                 className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:outline-none transition-colors dark:bg-slate-700 dark:text-white`}
                 placeholder="Nhập lại mật khẩu"
               />
+              {errors.confirm_password && errorMessage(errors.confirm_password.message!)}
             </div>
 
 
@@ -150,7 +158,7 @@ export default function Register() {
                 'Đăng ký tài khoản'
               )}
             </button>
-            {errors && <p className="mt-1 text-sm text-red-500  whitespace-pre-line">{apiError}</p>}
+            {apiError && errorMessage(apiError)}
             {isSuccess && <p className="mt-1 text-sm text-green-500  whitespace-pre-line">Register Successful</p>}
           </div>
         </form>

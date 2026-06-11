@@ -61,7 +61,7 @@ export const useUpdateCourse = () => {
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: updateCourseRequest,
-        onSuccess: (data, variables) => {
+        onSuccess: (_data, variables) => {   //using _data để đánh dấu rằng tham số này không được sử dụng trong hàm, tránh lỗi ESLint
             queryClient.invalidateQueries({ queryKey: courseKeys.teacherCourses() }); //query key phải trùng với query key trong useGetTeacherCourses để tự động refetch sau khi tạo course mới
             queryClient.invalidateQueries({ queryKey: courseKeys.detail(variables.courseId) }); //refetch lại dữ liệu chi tiết course sau khi update để đảm bảo dữ liệu mới nhất được hiển thị nếu người dùng đang ở trang edit course
         }
